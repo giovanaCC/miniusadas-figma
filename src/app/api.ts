@@ -30,6 +30,23 @@ export type ListingSummary = {
   rejection_reason?: string | null;
 };
 
+const demoListings: ListingSummary[] = [
+  { id: "demo-1", title: "Trator YANMAR YT347", category: "mini_retroescavadeira", model: "YT347", year: 2022, hours_used: 320, price: 148000, dealer_name: "AgroSul Máquinas", city: "Campinas", state: "SP", status: "published" },
+  { id: "demo-2", title: "Miniescavadeira YANMAR VIO55", category: "mini_escavadeira", model: "VIO55", year: 2021, hours_used: 1100, price: 210000, dealer_name: "AgroSul Máquinas", city: "São Paulo", state: "SP", status: "pending_approval" },
+  { id: "demo-3", title: "Miniescavadeira YANMAR SV100", category: "mini_escavadeira", model: "SV100", year: 2023, hours_used: 180, price: 285000, dealer_name: "AgroSul Máquinas", city: "Curitiba", state: "PR", status: "draft" },
+  { id: "demo-4", title: "Mini pá carregadeira YANMAR V4-7", category: "mini_pa_carregadeira", model: "V4-7", year: 2020, hours_used: 890, price: 175000, dealer_name: "Constru Tech SP", city: "Ribeirão Preto", state: "SP", status: "paused" },
+];
+
+function isDemoSession() {
+  return localStorage.getItem("miniusadas_token")?.startsWith("demo-") ?? false;
+}
+
+function updateDemoListing(id: string, status: string) {
+  const item = demoListings.find((listing) => listing.id === id);
+  if (item) item.status = status;
+  return Promise.resolve(item);
+}
+
 type RequestOptions = {
   method?: string;
   body?: unknown;
@@ -77,7 +94,7 @@ export const authApi = {
 };
 
 export const dealerApi = {
-  listings: () => apiRequest<ListingSummary[]>("/dealer/listings"),
+  listings: () => isDemoSession() ? Promise.resolve(demoListings.filter((item) => item.dealer_name === "AgroSul Máquinas")) : apiRequest<ListingSummary[]>("/dealer/listings"),
   create: (body: {
     title: string;
     category: string;
@@ -86,16 +103,21 @@ export const dealerApi = {
     hours_used?: number;
     price: number;
     description?: string;
-  }) => apiRequest<ListingSummary>("/dealer/listings", { method: "POST", body }),
-  submit: (id: string) => apiRequest(`/dealer/listings/${id}/submit`, { method: "PATCH" }),
-  pause: (id: string) => apiRequest(`/dealer/listings/${id}/pause`, { method: "PATCH" }),
-  sold: (id: string) => apiRequest(`/dealer/listings/${id}/sold`, { method: "PATCH" }),
+  }) => {
+    if (!isDemoSession()) return apiRequest<ListingSummary>("/dealer/listings", { method: "POST", body });
+    const item: ListingSummary = { id: `demo-${Date.now()}`, ...body, dealer_name: "AgroSul Máquinas", status: "draft" };
+    demoListings.unshift(item);
+    return Promise.resolve(item);
+  },
+  submit: (id: string) => isDemoSession() ? updateDemoListing(id, "pending_approval") : apiRequest(`/dealer/listings/${id}/submit`, { method: "PATCH" }),
+  pause: (id: string) => isDemoSession() ? updateDemoListing(id, "paused") : apiRequest(`/dealer/listings/${id}/pause`, { method: "PATCH" }),
+  sold: (id: string) => isDemoSession() ? updateDemoListing(id, "sold") : apiRequest(`/dealer/listings/${id}/sold`, { method: "PATCH" }),
 };
 
 export const adminApi = {
-  listings: (status = "") => apiRequest<ListingSummary[]>(`/admin/listings${status ? `?status=${status}` : ""}`),
-  approve: (id: string) => apiRequest(`/admin/listings/${id}/approve`, { method: "PATCH" }),
-  reject: (id: string, reason: string) => apiRequest(`/admin/listings/${id}/reject`, { method: "PATCH", body: { reason } }),
+  listings: (status = "") => isDemoSession() ? Promise.resolve(status ? demoListings.filter((item) => item.status === status) : demoListings) : apiRequest<ListingSummary[]>(`/admin/listings${status ? `?status=${status}` : ""}`),
+  approve: (id: string) => isDemoSession() ? updateDemoListing(id, "published") : apiRequest(`/admin/listings/${id}/approve`, { method: "PATCH" }),
+  reject: (id: string, reason: string) => isDemoSession() ? updateDemoListing(id, "draft") : apiRequest(`/admin/listings/${id}/reject`, { method: "PATCH", body: { reason } }),
 };
 
 export function formatPrice(value: string | number) {

@@ -54,6 +54,12 @@ export function Login() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4 text-xs text-gray-600">
+          <p className="font-bold text-gray-800 mb-2">Acessos para apresentação</p>
+          <p><strong>Master:</strong> master@miniusadas.com.br</p>
+          <p><strong>Concessionária:</strong> concessionaria@miniusadas.com.br</p>
+          <p><strong>Senha:</strong> Miniusadas@2026</p>
+        </div>
         <Link to="/" className="block text-center text-sm text-gray-500 hover:text-red-600 mt-5">← Voltar ao portal</Link>
       </div>
     </div>

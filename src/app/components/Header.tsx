@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import yanmarLogo from "../../imports/Logo_Yanmar_Horizontal_1.png";
-import { useAuth } from "../AuthContext";
 
 const navItems = [
   { label: "Início", href: "/" },
@@ -15,8 +14,6 @@ const navItems = [
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
-  const portalPath = user ? (user.role === "admin" ? "/admin" : "/painel") : "/entrar";
 
   return (
     <header className="w-full bg-white shadow-sm sticky top-0 z-50">
@@ -27,8 +24,8 @@ export function Header() {
             Marketplace oficial de máquinas YANMAR usadas, em demonstração e locação
           </span>
           <div className="flex items-center gap-4">
-            <Link to={portalPath} className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>
-              {user ? "Meu painel" : "Portal do Revendedor"}
+            <Link to="/entrar" className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>
+              Portal do Revendedor
             </Link>
             <span className="text-white/20">|</span>
             <a href="#" className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>

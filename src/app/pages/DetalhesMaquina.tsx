@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { ChevronLeft, ChevronRight, MapPin, Star, Phone, Mail, MessageSquare, Share2, Heart, CheckCircle2, ShieldCheck, Clock, ArrowRight } from "lucide-react";
-import { formatPrice, listingsApi } from "../api";
-import { fallbackMachineImage } from "../machineAdapter";
 
-const fallbackMachineData = {
+const machineData = {
   id: "1",
   name: "Trator YANMAR YT347",
   year: 2022,
@@ -58,76 +56,10 @@ const relatedMachines = [
 
 export function DetalhesMaquina() {
   const { id } = useParams();
-  const [machine, setMachine] = useState<any>(fallbackMachineData);
-  const [related, setRelated] = useState<any[]>(relatedMachines);
+  const machine = machineData;
   const [currentImg, setCurrentImg] = useState(0);
   const [saved, setSaved] = useState(false);
   const [formData, setFormData] = useState({ nome: "", telefone: "", email: "", mensagem: "Olá, tenho interesse neste equipamento. Poderia me fornecer mais informações?" });
-  const [leadStatus, setLeadStatus] = useState("");
-
-  useEffect(() => {
-    if (!id) return;
-    listingsApi.getById(id).then((data) => {
-      const images = data.photos?.length ? data.photos.map((photo: any) => photo.url) : [data.cover_url || fallbackMachineImage];
-      const specs = Object.entries(data.specs || {}).map(([label, value]) => ({
-        label: label.replaceAll("_", " "),
-        value: String(value),
-      }));
-      setMachine({
-        id: data.id,
-        name: data.title,
-        year: data.year,
-        hours: `${Number(data.hours_used || 0).toLocaleString("pt-BR")} h`,
-        condition: "Usada",
-        conditionColor: "#2D7A2D",
-        price: formatPrice(data.price),
-        location: [data.city, data.state].filter(Boolean).join(" - ") || "Brasil",
-        dealer: data.dealer_name,
-        dealerPhone: data.dealer_phone || "0800 722 7777",
-        dealerEmail: data.dealer_email || "contato@yanmar.com.br",
-        dealerRating: 4.9,
-        dealerReviews: 127,
-        rating: 4.9,
-        category: data.category,
-        model: data.model,
-        images,
-        mainInfo: [
-          { label: "Modelo", value: data.model || "YANMAR" },
-          { label: "Ano", value: String(data.year || "—") },
-          { label: "Horas de uso", value: `${Number(data.hours_used || 0).toLocaleString("pt-BR")} horas` },
-          { label: "Estado de conservação", value: "Muito bom" },
-          { label: "Tipo de oferta", value: "Venda (Usada)" },
-          { label: "Localização", value: [data.city, data.state].filter(Boolean).join(" - ") || "Brasil" },
-        ],
-        technicalInfo: specs.length ? specs : [{ label: "Informações", value: "Consulte a concessionária" }],
-      });
-      if (data.related?.length) {
-        setRelated(data.related.map((item: any) => ({
-          id: item.id,
-          name: item.title,
-          year: item.year,
-          price: formatPrice(item.price),
-          condition: "Usada",
-          image: item.cover_url || fallbackMachineImage,
-          conditionColor: "#2D7A2D",
-        })));
-      }
-      setCurrentImg(0);
-    }).catch(() => undefined);
-  }, [id]);
-
-  async function sendLead() {
-    if (!id || !formData.nome || !formData.email) {
-      setLeadStatus("Preencha seu nome e e-mail.");
-      return;
-    }
-    try {
-      await listingsApi.sendLead(id, { name: formData.nome, email: formData.email, phone: formData.telefone, message: formData.mensagem });
-      setLeadStatus("Interesse enviado com sucesso. A concessionária entrará em contato.");
-    } catch (error) {
-      setLeadStatus(error instanceof Error ? error.message : "Não foi possível enviar o interesse.");
-    }
-  }
 
   return (
     <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
@@ -314,14 +246,11 @@ export function DetalhesMaquina() {
                   style={{ fontSize: "0.83rem" }}
                 />
                 <button
-                  type="button"
-                  onClick={sendLead}
                   className="w-full text-white py-3 rounded-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#CC0000", fontSize: "0.875rem", fontWeight: 700 }}
                 >
                   <MessageSquare size={15} /> Enviar mensagem
                 </button>
-                {leadStatus && <p className="text-sm text-gray-600 bg-gray-50 border border-gray-100 rounded p-3">{leadStatus}</p>}
               </div>
             </div>
 
@@ -343,7 +272,7 @@ export function DetalhesMaquina() {
         <div className="mt-10">
           <h2 className="text-gray-900 mb-5" style={{ fontSize: "1.3rem", fontWeight: 700 }}>Máquinas relacionadas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {related.map((m) => (
+            {relatedMachines.map((m) => (
               <Link key={m.id} to={`/maquinas/${m.id}`} className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md hover:border-red-100 transition-all group">
                 <div className="relative overflow-hidden" style={{ height: "150px" }}>
                   <img src={m.image} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
