@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   Search, MapPin, ArrowRight, ChevronRight,
   ShieldCheck, Clock, Star, Tractor, HardHat, Zap, Anchor, CheckCircle2,
   Tag, Wrench, Users, BarChart3
 } from "lucide-react";
+import { listingsApi } from "../api";
+import { MachineCardData, toMachineCard } from "../machineAdapter";
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function HeroSearch() {
@@ -150,7 +152,7 @@ function HeroSearch() {
 }
 
 // ── Machine data ──────────────────────────────────────────────────────────────
-const featuredMachines = [
+const fallbackFeaturedMachines: MachineCardData[] = [
   {
     id: 1,
     name: "Trator YANMAR YT347",
@@ -237,7 +239,7 @@ const featuredMachines = [
   },
 ];
 
-function MachineCard({ machine }: { machine: typeof featuredMachines[0] }) {
+function MachineCard({ machine }: { machine: MachineCardData }) {
   return (
     <Link
       to={`/maquinas/${machine.id}`}
@@ -343,6 +345,16 @@ const steps = [
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function Home() {
+  const [featuredMachines, setFeaturedMachines] = useState<MachineCardData[]>(fallbackFeaturedMachines);
+
+  useEffect(() => {
+    listingsApi.list({ limit: 5 })
+      .then((response) => {
+        if (response.data.length) setFeaturedMachines(response.data.map(toMachineCard));
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <div>
       {/* 1. Banner com busca rápida */}

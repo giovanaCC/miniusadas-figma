@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Search, SlidersHorizontal, MapPin, Star, ChevronRight, X, ChevronDown, ArrowUpDown } from "lucide-react";
+import { listingsApi } from "../api";
+import { MachineCardData, toMachineCard } from "../machineAdapter";
 
-const allMachines = [
+const fallbackMachines: MachineCardData[] = [
   { id: 1, name: "Trator YANMAR YT347", year: 2022, hours: "320 h", condition: "Usada", price: "R$ 148.000", location: "Campinas - SP", image: "https://images.unsplash.com/photo-1563201515-adbe35c669c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=500&q=80", dealer: "AgroSul Máquinas", rating: 4.9, category: "Tratores de Rodas", model: "YT347", conditionColor: "#2D7A2D" },
   { id: 2, name: "Miniescavadeira YANMAR VIO55", year: 2021, hours: "1.100 h", condition: "Usada", price: "R$ 210.000", location: "São Paulo - SP", image: "https://images.unsplash.com/photo-1495036019936-220b29b930ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=500&q=80", dealer: "Constru Tech SP", rating: 4.7, category: "Miniescavadeiras", model: "VIO55", conditionColor: "#2D7A2D" },
   { id: 3, name: "Trator YANMAR YT359", year: 2023, hours: "80 h", condition: "Demonstração", price: "R$ 185.000", location: "Ribeirão Preto - SP", image: "https://images.unsplash.com/photo-1564868480822-32f714a0e763?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=500&q=80", dealer: "YANMAR Agro Ribeirão", rating: 5.0, category: "Tratores de Rodas", model: "YT359", conditionColor: "#0066CC" },
@@ -17,6 +19,7 @@ const allMachines = [
 const sortOptions = ["Mais recentes", "Menor preço", "Maior preço", "Menor hora-máquina", "Melhor avaliação"];
 
 export function Maquinas() {
+  const [machines, setMachines] = useState<MachineCardData[]>(fallbackMachines);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string[]>([]);
   const [selectedCondicao, setSelectedCondicao] = useState<string[]>([]);
@@ -24,7 +27,7 @@ export function Maquinas() {
   const [sortBy, setSortBy] = useState("Mais recentes");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const categories = ["Tratores de Rodas", "Tratores de Esteira", "Miniescavadeiras", "Colheitadeiras", "Motores Diesel", "Grupos Geradores", "Motores Náuticos"];
+  const categories = ["Miniescavadeiras", "Mini pás carregadeiras", "Mini retroescavadeiras"];
   const condicoes = ["Usada", "Demonstração", "Locação"];
   const estados = ["São Paulo - SP", "Curitiba - PR", "Porto Alegre - RS", "Belo Horizonte - MG", "Goiânia - GO", "Florianópolis - SC"];
   const precoRanges = ["Até R$ 50.000", "R$ 50k – R$ 150k", "R$ 150k – R$ 400k", "Acima de R$ 400k"];
@@ -34,7 +37,15 @@ export function Maquinas() {
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
   };
 
-  const filtered = allMachines.filter((m) => {
+  useEffect(() => {
+    listingsApi.list({ limit: 50 })
+      .then((response) => {
+        if (response.data.length) setMachines(response.data.map(toMachineCard));
+      })
+      .catch(() => undefined);
+  }, []);
+
+  const filtered = machines.filter((m) => {
     if (searchTerm && !m.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     if (selectedCategoria.length && !selectedCategoria.includes(m.category)) return false;
     if (selectedCondicao.length && !selectedCondicao.includes(m.condition)) return false;
