@@ -17,19 +17,29 @@ function HeroSearch() {
 
   return (
     <section
-      className="relative w-full"
+      className="relative w-full overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #1C1C1C 0%, #2D2D2D 60%, #3D1A1A 100%)",
-        minHeight: "480px",
+        background: "#171717",
+        minHeight: "540px",
       }}
     >
-      {/* Background image overlay */}
+      {/* Máquina em destaque no banner */}
+      <div className="absolute inset-y-0 right-0 w-full lg:w-[64%] flex items-center justify-end pointer-events-none">
+        <img
+          src="/images/yanmar-vio17.jpg"
+          alt="Miniescavadeira YANMAR ViO17"
+          className="h-[78%] lg:h-[92%] w-full object-contain object-right opacity-55 lg:opacity-100"
+          style={{ filter: "drop-shadow(0 28px 35px rgba(0,0,0,0.45))" }}
+        />
+      </div>
       <div
-        className="absolute inset-0 opacity-20 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1606739211185-2c846d734a6d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1600&q=80')" }}
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(90deg, #171717 0%, rgba(23,23,23,0.98) 38%, rgba(23,23,23,0.72) 66%, rgba(23,23,23,0.18) 100%)",
+        }}
       />
 
-      <div className="relative max-w-5xl mx-auto px-6 py-16 flex flex-col items-center text-center">
+      <div className="relative max-w-7xl mx-auto px-6 py-16 flex flex-col items-start text-left">
         {/* Badge */}
         <span
           className="inline-block text-white px-3 py-1 rounded-full mb-5"
@@ -38,15 +48,15 @@ function HeroSearch() {
           Marketplace Oficial YANMAR
         </span>
 
-        <h1 className="text-white mb-3" style={{ fontSize: "2.5rem", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.02em" }}>
+        <h1 className="text-white mb-3" style={{ fontSize: "clamp(2.25rem, 4vw, 3.45rem)", fontWeight: 800, lineHeight: 1.08, letterSpacing: "-0.03em", maxWidth: "680px" }}>
           Compre e venda máquinas<br />YANMAR com segurança
         </h1>
-        <p className="text-white/70 mb-10" style={{ fontSize: "1rem", lineHeight: 1.6, maxWidth: "520px" }}>
+        <p className="text-white/75 mb-10" style={{ fontSize: "1rem", lineHeight: 1.6, maxWidth: "540px" }}>
           Tratores, escavadeiras e equipamentos usados, em demonstração ou locação. Direto das concessionárias autorizadas.
         </p>
 
         {/* Search card */}
-        <div className="w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden">
           {/* Tipo tabs */}
           <div style={{ backgroundColor: "#F7F7F7", borderBottom: "1px solid #E8E8E8" }} className="flex">
             {["Todos", "Usada", "Demonstração", "Locação"].map((t) => (
