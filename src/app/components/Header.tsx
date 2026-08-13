@@ -7,7 +7,6 @@ const navItems = [
   { label: "Início", href: "/" },
   { label: "Máquinas", href: "/maquinas" },
   { label: "Sobre a Miniusadas", href: "/sobre" },
-  { label: "Quero Anunciar", href: "/anunciar" },
   { label: "Contato", href: "/contato" },
 ];
 
@@ -21,14 +20,18 @@ export function Header() {
       <div style={{ backgroundColor: "#1C1C1C" }} className="py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <span className="text-white/60" style={{ fontSize: "0.72rem" }}>
-            Marketplace oficial de máquinas YANMAR usadas, em demonstração e locação
+            Marketplace oficial de máquinas de construção YANMAR
           </span>
           <div className="flex items-center gap-4">
-            <Link to="/entrar" className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>
+            <Link
+              to="/entrar"
+              className="text-white/60 hover:text-white transition-colors"
+              style={{ fontSize: "0.72rem" }}
+            >
               Portal do Revendedor
             </Link>
             <span className="text-white/20">|</span>
-            <a href="#" className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>
+            <a href="tel:08007227777" className="text-white/60 hover:text-white transition-colors" style={{ fontSize: "0.72rem" }}>
               0800 722 7777
             </a>
           </div>
@@ -80,13 +83,13 @@ export function Header() {
             })}
           </nav>
 
-          {/* CTA */}
+          {/* CTA: ver máquinas */}
           <Link
-            to="/anunciar"
+            to="/maquinas"
             className="hidden lg:inline-flex items-center text-white px-4 py-2 rounded-sm hover:opacity-90 transition-opacity flex-shrink-0"
             style={{ backgroundColor: "#CC0000", fontSize: "0.82rem", fontWeight: 700 }}
           >
-            + Anunciar máquina
+            Ver máquinas
           </Link>
 
           {/* Mobile toggle */}
@@ -115,12 +118,12 @@ export function Header() {
             </Link>
           ))}
           <Link
-            to="/anunciar"
+            to="/maquinas"
             className="mt-3 block text-center text-white py-3 rounded-sm"
             style={{ backgroundColor: "#CC0000", fontSize: "0.9rem", fontWeight: 700 }}
             onClick={() => setMobileOpen(false)}
           >
-            + Anunciar máquina
+            Ver máquinas disponíveis
           </Link>
         </div>
       )}
